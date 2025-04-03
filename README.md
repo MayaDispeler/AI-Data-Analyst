@@ -10,7 +10,6 @@ Transform natural language questions into SQL queries, visualize data, and inter
     <img src="/Screenshot%202025-02-25%20at%2012.40.14 PM.png" alt="Database Connection UI" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
     <img src="/Screenshot%202025-02-25%20at%2012.40.28 PM.png" alt="Connection Settings" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
     <img src="/Screenshot%202025-02-25%20at%2012.40.40 PM.png" alt="Query Interface" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
-    
     <!-- Row 2 -->
     <img src="/Screenshot%202025-02-25%20at%202.03.27 PM.png" alt="Data Visualization" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
     <img src="/Screenshot%202025-04-03%20at%2011.18.07 AM.png" alt="Chat Interface" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
