@@ -14,5 +14,6 @@ pandas
 plotly
 dash
 seaborn
+sklearn
 # aimrocks==0.5.*
 

@@ -16,6 +16,7 @@ from rich.table import Table
 import time
 from pydantic import BaseModel
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 # Add this new model for database connection
 class DatabaseConnection(BaseModel):
@@ -287,56 +288,84 @@ async def process_query(user_message: dict, db: Session = Depends(get_db)):
         logger.error(f"Processing failed: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
 
-# Add the new endpoint for testing database connections
+# Store active database connections
+active_connections = {}
+
 @app.post("/connect/")
-async def connect_database(db_conn: DatabaseConnection):
-    """
-    Test a database connection with provided credentials.
-    Returns success or error message.
-    """
+async def connect_database(connection: DatabaseConnection):
+    """Connect to database using provided credentials"""
     try:
-        # Construct connection string based on database type
-        if db_conn.db_type == "mysql":
-            connection_string = (
-                f"mysql+pymysql://{db_conn.db_user}:{db_conn.db_password}"
-                f"@{db_conn.db_host}:{db_conn.db_port}/{db_conn.db_name}"
-            )
-        elif db_conn.db_type == "postgresql":
-            connection_string = (
-                f"postgresql+psycopg2://{db_conn.db_user}:{db_conn.db_password}"
-                f"@{db_conn.db_host}:{db_conn.db_port}/{db_conn.db_name}"
-            )
-        elif db_conn.db_type == "sqlserver":
-            connection_string = (
-                f"mssql+pyodbc://{db_conn.db_user}:{db_conn.db_password}"
-                f"@{db_conn.db_host}:{db_conn.db_port}/{db_conn.db_name}"
-                "?driver=ODBC+Driver+17+for+SQL+Server"
-            )
-        elif db_conn.db_type == "oracle":
-            connection_string = (
-                f"oracle+cx_oracle://{db_conn.db_user}:{db_conn.db_password}"
-                f"@{db_conn.db_host}:{db_conn.db_port}/{db_conn.db_name}"
-            )
-        else:
-            raise HTTPException(status_code=400, detail=f"Unsupported database type: {db_conn.db_type}")
+        # Log incoming connection request
+        logger.info(f"Received connection request for database: {connection.db_host}:{connection.db_port}/{connection.db_name}")
+        logger.info(f"Using username: {connection.db_user}")
         
-        # Create engine and test the connection
-        engine = create_engine(connection_string, pool_pre_ping=True)
+        # Construct connection string
+        connection_string = (
+            f"mysql+pymysql://{connection.db_user}:{connection.db_password}"
+            f"@{connection.db_host}:{connection.db_port}/{connection.db_name}"
+        )
+        logger.info("Constructed connection string (password hidden)")
         
-        # Verify connection works
-        with engine.connect() as connection:
-            # Get basic database metadata
-            result = connection.execute(text("SELECT 1"))
-            tables_result = connection.execute(text("SHOW TABLES" if db_conn.db_type == "mysql" else "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"))
-            tables = [table[0] for table in tables_result]
+        # Create engine with connection pooling
+        engine = create_engine(
+            connection_string,
+            pool_size=20,
+            max_overflow=40,
+            pool_recycle=180,
+            pool_pre_ping=True
+        )
+        logger.info("Created SQLAlchemy engine")
         
-        return {
-            "status": "success",
-            "message": f"Successfully connected to {db_conn.db_name} database",
-            "tables_found": len(tables),
-            "tables": tables[:10]  # Return first 10 tables for preview
-        }
-    
+        # Test connection with detailed error handling
+        try:
+            with engine.connect() as conn:
+                logger.info("Attempting to execute test query")
+                # Test basic query
+                result = conn.execute(text("SELECT 1"))
+                logger.info("Successfully executed test query")
+                
+                # Get list of tables to verify database access
+                logger.info("Attempting to fetch table list")
+                tables = conn.execute(text("SHOW TABLES"))
+                table_list = [table[0] for table in tables]
+                logger.info(f"Successfully fetched {len(table_list)} tables")
+                
+                # Store the engine in active connections
+                connection_id = f"{connection.db_host}_{connection.db_name}"
+                active_connections[connection_id] = engine
+                logger.info(f"Stored connection with ID: {connection_id}")
+                
+                return {
+                    "status": "success",
+                    "message": "Database connected successfully",
+                    "tables_found": len(table_list),
+                    "tables": table_list[:10]  # Return first 10 tables for preview
+                }
+        except Exception as conn_error:
+            logger.error(f"Database connection error: {str(conn_error)}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to connect to database: {str(conn_error)}"
+            )
     except Exception as e:
-        logging.error(f"Database connection error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to connect to database: {str(e)}")
+        logger.error(f"General error during connection: {str(e)}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Connection error: {str(e)}"
+        )
+
+# Modify get_db to use the active connection
+def get_db():
+    """Get database session from active connection"""
+    # For now, we'll use the first active connection
+    # In a real app, you'd want to handle multiple connections
+    if not active_connections:
+        raise HTTPException(status_code=400, detail="No active database connection")
+    
+    engine = list(active_connections.values())[0]
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
