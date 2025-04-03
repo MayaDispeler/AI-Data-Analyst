@@ -2,8 +2,22 @@
 
 Transform natural language questions into SQL queries, visualize data, and interact with your database through an intuitive AI-powered interface.
 
-![Screenshot 1](/Screenshot%202025-04-03%20at%2011.18.07 AM.png)
-![Screenshot 2](/Screenshot%202025-04-03%20at%2011.18.26 AM.png)
+## UI Gallery 🖼️
+
+<div align="center">
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0;">
+    <!-- Row 1 -->
+    <img src="/Screenshot%202025-02-25%20at%2012.40.14 PM.png" alt="Database Connection UI" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+    <img src="/Screenshot%202025-02-25%20at%2012.40.28 PM.png" alt="Connection Settings" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+    <img src="/Screenshot%202025-02-25%20at%2012.40.40 PM.png" alt="Query Interface" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+    
+    <!-- Row 2 -->
+    <img src="/Screenshot%202025-02-25%20at%202.03.27 PM.png" alt="Data Visualization" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+    <img src="/Screenshot%202025-04-03%20at%2011.18.07 AM.png" alt="Chat Interface" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+    <img src="/Screenshot%202025-04-03%20at%2011.18.26 AM.png" alt="Response Formats" style="width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+  </div>
+  <em>From left to right: Connection UI, Settings Panel, Query Interface, Visualization Examples, Chat Experience, and Multiple Output Formats</em>
+</div>
 
 ## Features ✨
 - **Natural Language Processing**: Ask questions in plain English
