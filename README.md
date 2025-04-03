@@ -2,7 +2,6 @@
 
 Transform natural language questions into SQL queries, visualize data, and interact with your database through an intuitive AI-powered interface.
 
-## UI Gallery 🖼️
 
 ## UI Gallery 🖼️
 
