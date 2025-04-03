@@ -1,0 +1,18 @@
+pymysql
+llama_index
+# llama-index-callbacks-aim
+openai
+sqlalchemy
+IPython
+python-dotenv
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+python-dotenv
+pandas
+plotly
+dash
+seaborn
+# aimrocks==0.5.*
+
